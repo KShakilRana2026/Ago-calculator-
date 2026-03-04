@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>আলটিমেট বয়স ক্যালকুলেটর প্রো</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-white: #ffffff;
+            --card-bg: #f8fafc;
+            --border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --gradient-1: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-white);
+            color: var(--text-main);
+            padding: 15px;
+        }
+
+        .container {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            padding: 40px 20px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .header-title {
+            text-align: center;
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Input Section */
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .input-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 15px 5px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            color: var(--text-main);
+            font-size: 18px;
+            text-align: center;
+            font-weight: 600;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .input-wrapper input:focus {
+            border-color: #6366f1;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .input-wrapper label {
+            position: absolute;
+            bottom: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+            color: white;
+        }
+
+        .btn-calc { background: var(--gradient-1); box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
+        .btn-reset { background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; }
+        .btn:active { transform: scale(0.96); }
+
+        /* Result Area */
+        .result-container {
+            margin-top: 35px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; translateY: 10px; }
+            to { opacity: 1; translateY: 0; }
+        }
+
+        .main-age-card {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .main-age-text { font-size: 24px; font-weight: 700; color: #1e293b; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            padding: 15px 5px;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .stat-icon { font-size: 20px; margin-bottom: 5px; }
+        .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
+        .stat-value { font-size: 16px; font-weight: 700; color: #1e293b; display: block; }
+
+        .next-bday {
+            margin-top: 20px;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            padding: 15px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .next-bday-date { font-size: 18px; font-weight: 700; color: #065f46; margin: 5px 0; }
+        .next-bday-count { font-size: 14px; color: #047857; background: #ffffff; padding: 4px 12px; border-radius: 50px; display: inline-block; }
+
+        @media (min-width: 480px) {
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2 class="header-title"><i class="fa-solid fa-hourglass-half"></i> AGE CALCULATOR</h2>
+        
+        <div class="input-group">
+            <div class="input-wrapper">
+                <input type="number" id="day" placeholder="DD">
+                <label>দিন</label>
+            </div>
+            <div class="input-wrapper">
+                <input type="number" id="month" placeholder="MM">
+                <label>মাস</label>
+            </div>
+            <div class="input-wrapper">
+                <input type="number" id="year" placeholder="YYYY">
+                <label>বছর</label>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-calc" onclick="calculateAge()">
+                <i class="fa-solid fa-calculator"></i> হিসাব করুন
+            </button>
+            <button class="btn btn-reset" onclick="resetFields()">
+                <i class="fa-solid fa-rotate-left"></i> রিসেট
+            </button>
+        </div>
+
+        <div id="resultContainer" class="result-container">
+            <div class="main-age-card">
+                <div class="main-age-text" id="mainAge"></div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card" style="border-bottom: 3px solid #3b82f6;">
+                    <div class="stat-icon">🗓️</div>
+                    <span class="stat-label">মোট মাস</span>
+                    <span class="stat-value" id="totalMonths">০</span>
+                </div>
+                <div class="stat-card" style="border-bottom: 3px solid #8b5cf6;">
+                    <div class="stat-icon">📆</div>
+                    <span class="stat-label">মোট সপ্তাহ</span>
+                    <span class="stat-value" id="totalWeeks">০</span>
+                </div>
+                <div class="stat-card" style="border-bottom: 3px solid #f59e0b;">
+                    <div class="stat-icon">☀️</div>
+                    <span class="stat-label">মোট দিন</span>
+                    <span class="stat-value" id="totalDays">০</span>
+                </div>
+                <div class="stat-card" style="border-bottom: 3px solid #10b981;">
+                    <div class="stat-icon">⏳</div>
+                    <span class="stat-label">মোট ঘণ্টা</span>
+                    <span class="stat-value" id="totalHours">০</span>
+                </div>
+                <div class="stat-card" style="border-bottom: 3px solid #ec4899;">
+                    <div class="stat-icon">⏱️</div>
+                    <span class="stat-label">মোট মিনিট</span>
+                    <span class="stat-value" id="totalMinutes">০</span>
+                </div>
+                <div class="stat-card" style="border-bottom: 3px solid #ef4444;">
+                    <div class="stat-icon">⚡</div>
+                    <span class="stat-label">মোট সেকেন্ড</span>
+                    <span class="stat-value" id="totalSeconds">০</span>
+                </div>
+            </div>
+
+            <div class="next-bday" id="nextBirthday"></div>
+        </div>
+    </div>
+
+    <script>
+        function calculateAge() {
+            const d = parseInt(document.getElementById('day').value);
+            const m = parseInt(document.getElementById('month').value);
+            const y = parseInt(document.getElementById('year').value);
+
+            if (!d || !m || !y || d > 31 || m > 12 || y < 1000) {
+                alert("দয়া করে সঠিক তারিখ দিন!");
+                return;
+            }
+
+            const today = new Date();
+            const birthDate = new Date(y, m - 1, d);
+
+            if (birthDate > today) {
+                alert("ভবিষ্যতের তারিখ দেওয়া সম্ভব নয়!");
+                return;
+            }
+
+            let years = today.getFullYear() - birthDate.getFullYear();
+            let months = today.getMonth() - birthDate.getMonth();
+            let days = today.getDate() - birthDate.getDate();
+
+            if (days < 0) {
+                months--;
+                const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                days += lastMonth.getDate();
+            }
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            document.getElementById('resultContainer').style.display = 'block';
+
+            const toBn = (num) => num.toLocaleString('bn-BD');
+
+            document.getElementById('mainAge').innerHTML = 
+                `<span style="color:#6366f1">${toBn(years)}</span> বছর ` +
+                `<span style="color:#3b82f6">${toBn(months)}</span> মাস ` +
+                `<span style="color:#ef4444">${toBn(days)}</span> দিন`;
+
+            const diffTime = Math.abs(today - birthDate);
+            const totalDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+            document.getElementById('totalMonths').innerText = toBn(years * 12 + months);
+            document.getElementById('totalWeeks').innerText = toBn(Math.floor(totalDays / 7));
+            document.getElementById('totalDays').innerText = toBn(totalDays);
+            document.getElementById('totalHours').innerText = toBn(totalDays * 24);
+            document.getElementById('totalMinutes').innerText = toBn(totalDays * 24 * 60);
+            document.getElementById('totalSeconds').innerText = toBn(totalDays * 24 * 3600);
+
+            let nextBday = new Date(today.getFullYear(), m - 1, d);
+            if (nextBday < today) nextBday.setFullYear(today.getFullYear() + 1);
+            
+            const diffBday = Math.ceil((nextBday - today) / (1000 * 60 * 60 * 24));
+            const dayName = nextBday.toLocaleDateString('bn-BD', { weekday: 'long' });
+            
+            document.getElementById('nextBirthday').innerHTML = `
+                <div style="font-size:13px; color:#047857">পরবর্তী জন্মদিন</div>
+                <div class="next-bday-date">${toBn(nextBday.getDate())} ${nextBday.toLocaleDateString('bn-BD', {month:'long'})}, ${dayName}</div>
+                <div class="next-bday-count">আর মাত্র <strong>${toBn(diffBday)}</strong> দিন বাকি</div>
+            `;
+        }
+
+        function resetFields() {
+            document.querySelectorAll('input').forEach(i => i.value = '');
+            document.getElementById('resultContainer').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
