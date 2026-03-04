@@ -1,325 +1,1500 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>আলটিমেট বয়স ক্যালকুলেটর প্রো</title>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-white: #ffffff;
-            --card-bg: #f8fafc;
-            --border: #e2e8f0;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --gradient-1: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate Age Calculator</title>
+<link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/747/747310.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --bg-primary: #f0ebe3;
+  --bg-secondary: #faf8f5;
+  --bg-card: rgba(255,255,255,0.75);
+  --bg-card-hover: rgba(255,255,255,0.92);
+  --text-primary: #1a1a2e;
+  --text-secondary: #4a4a5a;
+  --text-muted: #8a8a9a;
+  --accent: #c9553d;
+  --accent-glow: rgba(201,85,61,0.35);
+  --accent-secondary: #e8a838;
+  --accent-tertiary: #3a7ca5;
+  --border: rgba(0,0,0,0.06);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 8px 32px rgba(0,0,0,0.06);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,0.08);
+  --glass-border: rgba(255,255,255,0.5);
+  --particle-color: rgba(201,85,61,0.12);
+  --calendar-highlight: #c9553d;
+  --calendar-bg: rgba(255,255,255,0.6);
+  --select-bg: #fff;
+  --select-border: rgba(0,0,0,0.1);
+  --stat-bg: linear-gradient(135deg, rgba(201,85,61,0.08), rgba(232,168,56,0.06));
+  --ring-track: rgba(0,0,0,0.06);
+}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Hind Siliguri', sans-serif;
-        }
+html.dark {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-card: rgba(25,25,35,0.75);
+  --bg-card-hover: rgba(30,30,42,0.9);
+  --text-primary: #eaeaef;
+  --text-secondary: #a0a0b2;
+  --text-muted: #5a5a6e;
+  --accent: #e06b52;
+  --accent-glow: rgba(224,107,82,0.3);
+  --accent-secondary: #f0b848;
+  --accent-tertiary: #4a9cc5;
+  --border: rgba(255,255,255,0.06);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+  --shadow-md: 0 8px 32px rgba(0,0,0,0.3);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,0.4);
+  --glass-border: rgba(255,255,255,0.08);
+  --particle-color: rgba(224,107,82,0.08);
+  --calendar-highlight: #e06b52;
+  --calendar-bg: rgba(30,30,42,0.6);
+  --select-bg: #1c1c28;
+  --select-border: rgba(255,255,255,0.08);
+  --stat-bg: linear-gradient(135deg, rgba(224,107,82,0.1), rgba(240,184,72,0.06));
+  --ring-track: rgba(255,255,255,0.06);
+}
 
-        body {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: var(--bg-white);
-            color: var(--text-main);
-            padding: 15px;
-        }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .container {
-            background: #ffffff;
-            border: 1px solid var(--border);
-            padding: 40px 20px;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            position: relative;
-        }
+body {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+  transition: background 0.5s ease, color 0.5s ease;
+}
 
-        .header-title {
-            text-align: center;
-            font-size: 26px;
-            font-weight: 700;
-            margin-bottom: 30px;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+/* ─── Animated Background ─── */
+.bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
 
-        /* Input Section */
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            justify-content: center;
-        }
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: orbFloat 20s ease-in-out infinite;
+  opacity: 0.5;
+}
 
-        .input-wrapper {
-            position: relative;
-            flex: 1;
-        }
+.bg-orb:nth-child(1) {
+  width: 400px; height: 400px;
+  background: var(--accent-glow);
+  top: -10%; left: -5%;
+  animation-delay: 0s;
+}
+.bg-orb:nth-child(2) {
+  width: 350px; height: 350px;
+  background: rgba(58,124,165,0.15);
+  bottom: -15%; right: -10%;
+  animation-delay: -7s;
+  animation-duration: 25s;
+}
+.bg-orb:nth-child(3) {
+  width: 250px; height: 250px;
+  background: rgba(232,168,56,0.12);
+  top: 40%; left: 60%;
+  animation-delay: -14s;
+  animation-duration: 22s;
+}
 
-        .input-wrapper input {
-            width: 100%;
-            padding: 15px 5px;
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            color: var(--text-main);
-            font-size: 18px;
-            text-align: center;
-            font-weight: 600;
-            outline: none;
-            transition: 0.3s;
-        }
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(60px, -40px) scale(1.1); }
+  50% { transform: translate(-30px, 50px) scale(0.95); }
+  75% { transform: translate(40px, 20px) scale(1.05); }
+}
 
-        .input-wrapper input:focus {
-            border-color: #6366f1;
-            background: #ffffff;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
+/* Floating particles */
+.particle {
+  position: absolute;
+  width: 4px; height: 4px;
+  background: var(--particle-color);
+  border-radius: 50%;
+  animation: particleRise linear infinite;
+}
 
-        .input-wrapper label {
-            position: absolute;
-            bottom: -22px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 13px;
-            color: var(--text-muted);
-        }
+@keyframes particleRise {
+  0% { transform: translateY(100vh) scale(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+}
 
-        .action-buttons {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
+/* Grid pattern overlay */
+.grid-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 60px 60px;
+  opacity: 0.4;
+}
 
-        .btn {
-            flex: 1;
-            padding: 14px;
-            border: none;
-            border-radius: 16px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: 0.2s;
-            color: white;
-        }
+/* ─── Main Container ─── */
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 20px 40px;
+}
 
-        .btn-calc { background: var(--gradient-1); box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
-        .btn-reset { background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; }
-        .btn:active { transform: scale(0.96); }
+/* ─── Header ─── */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 36px;
+  opacity: 0;
+  animation: slideDown 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
+}
 
-        /* Result Area */
-        .result-container {
-            margin-top: 35px;
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-        @keyframes fadeIn {
-            from { opacity: 0; translateY: 10px; }
-            to { opacity: 1; translateY: 0; }
-        }
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
 
-        .main-age-card {
-            background: #f1f5f9;
-            border: 1px solid var(--border);
-            padding: 20px;
-            border-radius: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
+.logo-icon {
+  width: 46px; height: 46px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+  color: #fff;
+  font-size: 20px;
+  position: relative;
+  overflow: hidden;
+  animation: logoPulse 3s ease-in-out infinite;
+}
 
-        .main-age-text { font-size: 24px; font-weight: 700; color: #1e293b; }
+.logo-icon::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-secondary), var(--accent-tertiary));
+  z-index: -1;
+  animation: borderSpin 4s linear infinite;
+  filter: blur(4px);
+  opacity: 0.6;
+}
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
+@keyframes logoPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
 
-        .stat-card {
-            background: #ffffff;
-            padding: 15px 5px;
-            border-radius: 18px;
-            border: 1px solid var(--border);
-            text-align: center;
-        }
+@keyframes borderSpin {
+  to { transform: rotate(360deg); }
+}
 
-        .stat-icon { font-size: 20px; margin-bottom: 5px; }
-        .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
-        .stat-value { font-size: 16px; font-weight: 700; color: #1e293b; display: block; }
+.title-group h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  line-height: 1.1;
+}
 
-        .next-bday {
-            margin-top: 20px;
-            background: #ecfdf5;
-            border: 1px solid #a7f3d0;
-            padding: 15px;
-            border-radius: 20px;
-            text-align: center;
-        }
+.title-group span {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
 
-        .next-bday-date { font-size: 18px; font-weight: 700; color: #065f46; margin: 5px 0; }
-        .next-bday-count { font-size: 14px; color: #047857; background: #ffffff; padding: 4px 12px; border-radius: 50px; display: inline-block; }
+.mode-toggle {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.3s ease;
+  color: var(--text-primary);
+}
 
-        @media (min-width: 480px) {
-            .stats-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-    </style>
+.mode-toggle:hover {
+  transform: rotate(20deg) scale(1.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* ─── Cards ─── */
+.card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-md);
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+}
+
+.card:hover {
+  background: var(--bg-card-hover);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* ─── Input Section ─── */
+.input-section {
+  opacity: 0;
+  animation: slideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section-label {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-label i {
+  font-size: 11px;
+  animation: blink 2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.date-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+.date-label {
+  width: 160px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-label i {
+  color: var(--accent);
+  font-size: 16px;
+}
+
+.selects-group {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.select-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.select-wrap select {
+  width: 100%;
+  padding: 12px 16px;
+  padding-right: 32px;
+  border-radius: 14px;
+  border: 1.5px solid var(--select-border);
+  background: var(--select-bg);
+  color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  appearance: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.select-wrap select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.select-wrap::after {
+  content: '\f107';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 12px;
+  pointer-events: none;
+}
+
+/* Calculate Button */
+.btn-calculate {
+  width: 100%;
+  padding: 16px 32px;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), #d46a3a);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  margin-top: 8px;
+}
+
+.btn-calculate::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.btn-calculate:hover::before {
+  left: 100%;
+}
+
+.btn-calculate:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px var(--accent-glow);
+}
+
+.btn-calculate:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-calculate i {
+  margin-right: 8px;
+}
+
+/* ─── Result Section ─── */
+.result-section {
+  display: none;
+}
+
+.result-section.visible {
+  display: block;
+  animation: resultReveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes resultReveal {
+  from { opacity: 0; transform: translateY(40px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Age Hero Display */
+.age-hero {
+  text-align: center;
+  padding: 20px 0 30px;
+  position: relative;
+}
+
+.age-hero-label {
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.age-hero-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 52px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.age-hero-sub {
+  font-size: 16px;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* Stat Cards Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 24px 0;
+}
+
+.stat-card {
+  background: var(--stat-bg);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card.animate {
+  animation: statPop 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes statPop {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.stat-card:hover::after {
+  opacity: 0.15;
+}
+
+.stat-icon {
+  font-size: 22px;
+  margin-bottom: 10px;
+  color: var(--accent);
+}
+
+.stat-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 500;
+}
+
+/* Life Progress Ring */
+.life-progress-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 24px 0;
+  flex-wrap: wrap;
+}
+
+.ring-container {
+  position: relative;
+  width: 140px;
+  height: 140px;
+}
+
+.ring-container svg {
+  width: 140px;
+  height: 140px;
+  transform: rotate(-90deg);
+}
+
+.ring-track {
+  fill: none;
+  stroke: var(--ring-track);
+  stroke-width: 10;
+}
+
+.ring-fill {
+  fill: none;
+  stroke: url(#ringGradient);
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-dasharray: 377;
+  stroke-dashoffset: 377;
+  transition: stroke-dashoffset 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring-percent {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.ring-text {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.life-details {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.life-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.life-detail-item i {
+  width: 30px; height: 30px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+.life-detail-item:nth-child(1) i {
+  background: rgba(201,85,61,0.12);
+  color: var(--accent);
+}
+.life-detail-item:nth-child(2) i {
+  background: rgba(232,168,56,0.12);
+  color: var(--accent-secondary);
+}
+.life-detail-item:nth-child(3) i {
+  background: rgba(58,124,165,0.12);
+  color: var(--accent-tertiary);
+}
+
+.life-detail-item strong {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Next Birthday */
+.birthday-strip {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+  background: var(--stat-bg);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  margin: 20px 0;
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.birthday-strip.animate {
+  animation: slideRight 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.birthday-icon {
+  width: 44px; height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent-secondary), #f0c060);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  animation: cakeWiggle 2s ease-in-out infinite;
+}
+
+@keyframes cakeWiggle {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+
+.birthday-info {
+  flex: 1;
+}
+
+.birthday-info .label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.birthday-info .value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+/* Calendars */
+.calendars-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.cal-card {
+  background: var(--calendar-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.cal-card.animate {
+  animation: calPop 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes calPop {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.cal-header {
+  padding: 14px 18px;
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cal-header .cal-badge {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.cal-dob .cal-header { background: linear-gradient(135deg, rgba(201,85,61,0.12), rgba(201,85,61,0.04)); }
+.cal-dob .cal-badge { background: var(--accent); color: #fff; }
+.cal-cur .cal-header { background: linear-gradient(135deg, rgba(58,124,165,0.12), rgba(58,124,165,0.04)); }
+.cal-cur .cal-badge { background: var(--accent-tertiary); color: #fff; }
+
+.cal-body {
+  padding: 10px 14px 14px;
+}
+
+.cal-body table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 13px;
+}
+
+.cal-body th {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 6px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cal-body td {
+  padding: 7px 0;
+  color: var(--text-secondary);
+  font-weight: 400;
+  position: relative;
+}
+
+.cal-body td.today {
+  color: #fff;
+  font-weight: 700;
+}
+
+.cal-body td.today::before {
+  content: '';
+  position: absolute;
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  animation: highlightPop 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.cal-dob td.today::before { background: var(--accent); }
+.cal-cur td.today::before { background: var(--accent-tertiary); }
+
+@keyframes highlightPop {
+  from { transform: translate(-50%, -50%) scale(0); }
+  to { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Action Buttons */
+.action-bar {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.btn-action {
+  flex: 1;
+  padding: 14px 20px;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-action:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+
+.btn-action i {
+  font-size: 15px;
+}
+
+/* Error Toast */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: #e74c3c;
+  color: #fff;
+  padding: 14px 28px;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 999;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 8px 30px rgba(231,76,60,0.3);
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  margin-top: 50px;
+  padding: 24px;
+  font-size: 12px;
+  color: var(--text-muted);
+  opacity: 0;
+  animation: fadeIn 0.6s 0.8s forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+.footer .dev-name {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  color: var(--accent);
+  font-size: 14px;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 640px) {
+  .container { padding: 16px 14px 30px; }
+  .card { padding: 22px 18px; border-radius: 20px; }
+  .date-row { flex-direction: column; align-items: stretch; gap: 10px; }
+  .date-label { width: 100%; }
+  .selects-group { width: 100%; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .calendars-section { grid-template-columns: 1fr; }
+  .age-hero-value { font-size: 40px; }
+  .life-progress-section { flex-direction: column; gap: 24px; }
+  .action-bar { flex-direction: column; }
+  .title-group h1 { font-size: 20px; }
+}
+
+/* Confetti */
+.confetti-piece {
+  position: fixed;
+  z-index: 998;
+  pointer-events: none;
+  animation: confettiFall linear forwards;
+}
+
+@keyframes confettiFall {
+  0% { opacity: 1; transform: translateY(-10vh) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(110vh) rotate(720deg); }
+}
+
+/* Scroll animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
 </head>
+
 <body>
 
-    <div class="container">
-        <h2 class="header-title"><i class="fa-solid fa-hourglass-half"></i> AGE CALCULATOR</h2>
-        
-        <div class="input-group">
-            <div class="input-wrapper">
-                <input type="number" id="day" placeholder="DD">
-                <label>দিন</label>
-            </div>
-            <div class="input-wrapper">
-                <input type="number" id="month" placeholder="MM">
-                <label>মাস</label>
-            </div>
-            <div class="input-wrapper">
-                <input type="number" id="year" placeholder="YYYY">
-                <label>বছর</label>
-            </div>
-        </div>
+<!-- Animated Background -->
+<div class="bg-canvas">
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+</div>
+<div class="grid-overlay"></div>
 
-        <div class="action-buttons">
-            <button class="btn btn-calc" onclick="calculateAge()">
-                <i class="fa-solid fa-calculator"></i> হিসাব করুন
-            </button>
-            <button class="btn btn-reset" onclick="resetFields()">
-                <i class="fa-solid fa-rotate-left"></i> রিসেট
-            </button>
-        </div>
+<!-- SVG Defs for ring gradient -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--accent)"/>
+      <stop offset="100%" stop-color="var(--accent-secondary)"/>
+    </linearGradient>
+  </defs>
+</svg>
 
-        <div id="resultContainer" class="result-container">
-            <div class="main-age-card">
-                <div class="main-age-text" id="mainAge"></div>
-            </div>
+<div class="container">
 
-            <div class="stats-grid">
-                <div class="stat-card" style="border-bottom: 3px solid #3b82f6;">
-                    <div class="stat-icon">🗓️</div>
-                    <span class="stat-label">মোট মাস</span>
-                    <span class="stat-value" id="totalMonths">০</span>
-                </div>
-                <div class="stat-card" style="border-bottom: 3px solid #8b5cf6;">
-                    <div class="stat-icon">📆</div>
-                    <span class="stat-label">মোট সপ্তাহ</span>
-                    <span class="stat-value" id="totalWeeks">০</span>
-                </div>
-                <div class="stat-card" style="border-bottom: 3px solid #f59e0b;">
-                    <div class="stat-icon">☀️</div>
-                    <span class="stat-label">মোট দিন</span>
-                    <span class="stat-value" id="totalDays">০</span>
-                </div>
-                <div class="stat-card" style="border-bottom: 3px solid #10b981;">
-                    <div class="stat-icon">⏳</div>
-                    <span class="stat-label">মোট ঘণ্টা</span>
-                    <span class="stat-value" id="totalHours">০</span>
-                </div>
-                <div class="stat-card" style="border-bottom: 3px solid #ec4899;">
-                    <div class="stat-icon">⏱️</div>
-                    <span class="stat-label">মোট মিনিট</span>
-                    <span class="stat-value" id="totalMinutes">০</span>
-                </div>
-                <div class="stat-card" style="border-bottom: 3px solid #ef4444;">
-                    <div class="stat-icon">⚡</div>
-                    <span class="stat-label">মোট সেকেন্ড</span>
-                    <span class="stat-value" id="totalSeconds">০</span>
-                </div>
-            </div>
-
-            <div class="next-bday" id="nextBirthday"></div>
-        </div>
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-area">
+      <div class="logo-icon"><i class="fas fa-hourglass-half"></i></div>
+      <div class="title-group">
+        <h1>Age Calculator</h1>
+        <span>Precision Time Analytics</span>
+      </div>
     </div>
+    <button class="mode-toggle" id="modeToggle" aria-label="Toggle dark mode"><i class="fas fa-moon"></i></button>
+  </div>
 
-    <script>
-        function calculateAge() {
-            const d = parseInt(document.getElementById('day').value);
-            const m = parseInt(document.getElementById('month').value);
-            const y = parseInt(document.getElementById('year').value);
+  <!-- Result Section (shown after calculation) -->
+  <div class="result-section" id="resultSection">
+    <div class="card">
 
-            if (!d || !m || !y || d > 31 || m > 12 || y < 1000) {
-                alert("দয়া করে সঠিক তারিখ দিন!");
-                return;
-            }
+      <div class="age-hero">
+        <div class="age-hero-label">Your Age Is</div>
+        <div class="age-hero-value" id="heroAge">—</div>
+        <div class="age-hero-sub" id="heroSub"></div>
+      </div>
 
-            const today = new Date();
-            const birthDate = new Date(y, m - 1, d);
+      <!-- Stats Grid -->
+      <div class="stats-grid" id="statsGrid"></div>
 
-            if (birthDate > today) {
-                alert("ভবিষ্যতের তারিখ দেওয়া সম্ভব নয়!");
-                return;
-            }
+      <!-- Life Progress -->
+      <div class="life-progress-section">
+        <div class="ring-container">
+          <svg viewBox="0 0 140 140">
+            <circle class="ring-track" cx="70" cy="70" r="60"/>
+            <circle class="ring-fill" id="ringFill" cx="70" cy="70" r="60"/>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-percent" id="ringPercent">0%</div>
+            <div class="ring-text">Life Lived</div>
+          </div>
+        </div>
+        <div class="life-details" id="lifeDetails"></div>
+      </div>
 
-            let years = today.getFullYear() - birthDate.getFullYear();
-            let months = today.getMonth() - birthDate.getMonth();
-            let days = today.getDate() - birthDate.getDate();
+      <!-- Next Birthday -->
+      <div class="birthday-strip" id="birthdayStrip">
+        <div class="birthday-icon">🎂</div>
+        <div class="birthday-info">
+          <div class="label">Next Birthday</div>
+          <div class="value" id="nextBday">—</div>
+        </div>
+      </div>
 
-            if (days < 0) {
-                months--;
-                const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-                days += lastMonth.getDate();
-            }
-            if (months < 0) {
-                years--;
-                months += 12;
-            }
+      <!-- Calendars -->
+      <div class="calendars-section">
+        <div class="cal-card cal-dob" id="calDob"></div>
+        <div class="cal-card cal-cur" id="calCur"></div>
+      </div>
 
-            document.getElementById('resultContainer').style.display = 'block';
+      <!-- Action Buttons -->
+      <div class="action-bar">
+        <button class="btn-action" id="btnPdf"><i class="fas fa-file-pdf"></i> Download PDF</button>
+        <button class="btn-action" id="btnCopy"><i class="fas fa-copy"></i> Copy Result</button>
+        <button class="btn-action" id="btnReset"><i class="fas fa-redo"></i> Reset</button>
+      </div>
 
-            const toBn = (num) => num.toLocaleString('bn-BD');
+    </div>
+  </div>
 
-            document.getElementById('mainAge').innerHTML = 
-                `<span style="color:#6366f1">${toBn(years)}</span> বছর ` +
-                `<span style="color:#3b82f6">${toBn(months)}</span> মাস ` +
-                `<span style="color:#ef4444">${toBn(days)}</span> দিন`;
+  <!-- Input Section -->
+  <div class="input-section" id="inputSection">
+    <div class="card">
+      <div class="section-label"><i class="fas fa-circle"></i> Enter Your Details</div>
 
-            const diffTime = Math.abs(today - birthDate);
-            const totalDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      <div class="date-row">
+        <div class="date-label"><i class="fas fa-baby"></i> Date of Birth</div>
+        <div class="selects-group">
+          <div class="select-wrap"><select id="dobMonth"></select></div>
+          <div class="select-wrap"><select id="dobDay"></select></div>
+          <div class="select-wrap"><select id="dobYear"></select></div>
+        </div>
+      </div>
 
-            document.getElementById('totalMonths').innerText = toBn(years * 12 + months);
-            document.getElementById('totalWeeks').innerText = toBn(Math.floor(totalDays / 7));
-            document.getElementById('totalDays').innerText = toBn(totalDays);
-            document.getElementById('totalHours').innerText = toBn(totalDays * 24);
-            document.getElementById('totalMinutes').innerText = toBn(totalDays * 24 * 60);
-            document.getElementById('totalSeconds').innerText = toBn(totalDays * 24 * 3600);
+      <div class="date-row">
+        <div class="date-label"><i class="fas fa-calendar-check"></i> Calculate At</div>
+        <div class="selects-group">
+          <div class="select-wrap"><select id="curMonth"></select></div>
+          <div class="select-wrap"><select id="curDay"></select></div>
+          <div class="select-wrap"><select id="curYear"></select></div>
+        </div>
+      </div>
 
-            let nextBday = new Date(today.getFullYear(), m - 1, d);
-            if (nextBday < today) nextBday.setFullYear(today.getFullYear() + 1);
-            
-            const diffBday = Math.ceil((nextBday - today) / (1000 * 60 * 60 * 24));
-            const dayName = nextBday.toLocaleDateString('bn-BD', { weekday: 'long' });
-            
-            document.getElementById('nextBirthday').innerHTML = `
-                <div style="font-size:13px; color:#047857">পরবর্তী জন্মদিন</div>
-                <div class="next-bday-date">${toBn(nextBday.getDate())} ${nextBday.toLocaleDateString('bn-BD', {month:'long'})}, ${dayName}</div>
-                <div class="next-bday-count">আর মাত্র <strong>${toBn(diffBday)}</strong> দিন বাকি</div>
-            `;
-        }
+      <button class="btn-calculate" id="btnCalc"><i class="fas fa-calculator"></i> Calculate My Age</button>
+    </div>
+  </div>
 
-        function resetFields() {
-            document.querySelectorAll('input').forEach(i => i.value = '');
-            document.getElementById('resultContainer').style.display = 'none';
-        }
-    </script>
+  <!-- Footer -->
+  <div class="footer">
+    <div>Copyright &copy; 2025</div>
+    <div class="dev-name">꧁👑 ḊÄṚḲ_ṖṚЇṄĊЁ 👑꧂</div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ─── Theme ─── */
+(function initTheme() {
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.documentElement.classList.add('dark');
+  }
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+    if (e.matches) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  });
+})();
+
+document.getElementById('modeToggle').addEventListener('click', function() {
+  document.documentElement.classList.toggle('dark');
+  var icon = this.querySelector('i');
+  if (document.documentElement.classList.contains('dark')) {
+    icon.className = 'fas fa-sun';
+  } else {
+    icon.className = 'fas fa-moon';
+  }
+});
+
+/* ─── Particles ─── */
+(function spawnParticles() {
+  var canvas = document.querySelector('.bg-canvas');
+  for (var i = 0; i < 20; i++) {
+    var p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = (8 + Math.random() * 12) + 's';
+    p.style.animationDelay = (Math.random() * 10) + 's';
+    p.style.width = (2 + Math.random() * 4) + 'px';
+    p.style.height = p.style.width;
+    canvas.appendChild(p);
+  }
+})();
+
+/* ─── Dropdowns ─── */
+var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+var MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function populateMonths(id) {
+  var sel = document.getElementById(id);
+  MONTHS.forEach(function(m, i) {
+    var opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = m;
+    sel.appendChild(opt);
+  });
+}
+
+function populateYears(id) {
+  var sel = document.getElementById(id);
+  var now = new Date().getFullYear();
+  for (var y = now; y >= 1900; y--) {
+    var opt = document.createElement('option');
+    opt.value = y;
+    opt.textContent = y;
+    sel.appendChild(opt);
+  }
+}
+
+function populateDays(id, year, month) {
+  var sel = document.getElementById(id);
+  var prev = sel.value;
+  sel.innerHTML = '';
+  var total = new Date(year, month + 1, 0).getDate();
+  for (var d = 1; d <= total; d++) {
+    var opt = document.createElement('option');
+    opt.value = d;
+    opt.textContent = d;
+    sel.appendChild(opt);
+  }
+  if (prev && prev <= total) sel.value = prev;
+}
+
+populateMonths('dobMonth');
+populateMonths('curMonth');
+populateYears('dobYear');
+populateYears('curYear');
+
+var dobM = document.getElementById('dobMonth');
+var dobD = document.getElementById('dobDay');
+var dobY = document.getElementById('dobYear');
+var curM = document.getElementById('curMonth');
+var curD = document.getElementById('curDay');
+var curY = document.getElementById('curYear');
+
+function refreshDobDays() { populateDays('dobDay', +dobY.value, +dobM.value); }
+function refreshCurDays() { populateDays('curDay', +curY.value, +curM.value); }
+
+dobM.addEventListener('change', refreshDobDays);
+dobY.addEventListener('change', refreshDobDays);
+curM.addEventListener('change', refreshCurDays);
+curY.addEventListener('change', refreshCurDays);
+
+// Set "Calculate At" to today
+(function setToday() {
+  var now = new Date();
+  curY.value = now.getFullYear();
+  curM.value = now.getMonth();
+  refreshCurDays();
+  curD.value = now.getDate();
+})();
+
+refreshDobDays();
+
+/* ─── Toast ─── */
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2800);
+}
+
+/* ─── Confetti ─── */
+function fireConfetti() {
+  var colors = ['#c9553d', '#e8a838', '#3a7ca5', '#e06b52', '#f0b848', '#5dba5d'];
+  for (var i = 0; i < 50; i++) {
+    (function(idx) {
+      setTimeout(function() {
+        var el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.width = (6 + Math.random() * 8) + 'px';
+        el.style.height = (4 + Math.random() * 6) + 'px';
+        el.style.background = colors[Math.floor(Math.random() * colors.length)];
+        el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        el.style.animationDuration = (2 + Math.random() * 2) + 's';
+        document.body.appendChild(el);
+        setTimeout(function() { el.remove(); }, 4000);
+      }, idx * 30);
+    })(i);
+  }
+}
+
+/* ─── Number Counter Animation ─── */
+function animateCounter(el, target, duration) {
+  var start = 0;
+  var startTime = null;
+  var formatted = target.toLocaleString();
+
+  function step(ts) {
+    if (!startTime) startTime = ts;
+    var progress = Math.min((ts - startTime) / duration, 1);
+    var eased = 1 - Math.pow(1 - progress, 3);
+    var current = Math.floor(eased * target);
+    el.textContent = current.toLocaleString();
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    } else {
+      el.textContent = formatted;
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+/* ─── Calendar Builder ─── */
+function buildCalendar(containerId, date, type) {
+  var container = document.getElementById(containerId);
+  var year = date.getFullYear();
+  var month = date.getMonth();
+  var day = date.getDate();
+  var firstDay = new Date(year, month, 1).getDay();
+  var totalDays = new Date(year, month + 1, 0).getDate();
+
+  var label = type === 'dob' ? 'Birth Date' : 'Current Date';
+  var html = '<div class="cal-header">' +
+    '<span class="cal-badge">' + label + '</span> ' +
+    MONTHS[month] + ' ' + year +
+    '</div><div class="cal-body"><table><tr>';
+
+  var dayNames = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  dayNames.forEach(function(d) { html += '<th>' + d + '</th>'; });
+  html += '</tr><tr>';
+
+  for (var i = 0; i < firstDay; i++) html += '<td></td>';
+  for (var d = 1; d <= totalDays; d++) {
+    if ((firstDay + d - 1) % 7 === 0 && d !== 1) html += '</tr><tr>';
+    if (d === day) {
+      html += '<td class="today">' + d + '</td>';
+    } else {
+      html += '<td>' + d + '</td>';
+    }
+  }
+  html += '</tr></table></div>';
+  container.innerHTML = html;
+}
+
+/* ─── Calculate ─── */
+var lastResult = null;
+
+document.getElementById('btnCalc').addEventListener('click', function() {
+  var dob = new Date(+dobY.value, +dobM.value, +dobD.value);
+  var cur = new Date(+curY.value, +curM.value, +curD.value);
+
+  if (cur < dob) {
+    showToast('⚠️ The target date cannot be before the date of birth!');
+    return;
+  }
+
+  var diff = cur - dob;
+  var totalSeconds = Math.floor(diff / 1000);
+  var totalMinutes = Math.floor(totalSeconds / 60);
+  var totalHours = Math.floor(totalMinutes / 60);
+  var totalDays = Math.floor(totalHours / 24);
+  var totalWeeks = Math.floor(totalDays / 7);
+  var totalMonthsCalc = (cur.getFullYear() - dob.getFullYear()) * 12 + (cur.getMonth() - dob.getMonth());
+  if (cur.getDate() < dob.getDate()) totalMonthsCalc--;
+
+  var years = cur.getFullYear() - dob.getFullYear();
+  var months = cur.getMonth() - dob.getMonth();
+  var days = cur.getDate() - dob.getDate();
+
+  if (days < 0) {
+    months--;
+    days += new Date(cur.getFullYear(), cur.getMonth(), 0).getDate();
+  }
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+
+  // Life progress (assume 80 years)
+  var lifeExpectancy = 80;
+  var ageDecimal = years + months / 12 + days / 365.25;
+  var lifePercent = Math.min((ageDecimal / lifeExpectancy) * 100, 100);
+
+  // Next birthday
+  var nextBday = new Date(cur.getFullYear(), dob.getMonth(), dob.getDate());
+  if (nextBday <= cur) {
+    nextBday = new Date(cur.getFullYear() + 1, dob.getMonth(), dob.getDate());
+  }
+  var daysUntilBday = Math.ceil((nextBday - cur) / (1000 * 60 * 60 * 24));
+
+  // Day of week born
+  var dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var bornDay = dayNames[dob.getDay()];
+
+  lastResult = {
+    years: years, months: months, days: days,
+    totalDays: totalDays, totalHours: totalHours,
+    totalMinutes: totalMinutes, totalSeconds: totalSeconds,
+    totalWeeks: totalWeeks, totalMonths: totalMonthsCalc,
+    lifePercent: lifePercent, daysUntilBday: daysUntilBday,
+    bornDay: bornDay, nextBday: nextBday,
+    dob: dob, cur: cur
+  };
+
+  renderResult(lastResult);
+  fireConfetti();
+});
+
+function renderResult(r) {
+  var section = document.getElementById('resultSection');
+  section.classList.remove('visible');
+  // Force reflow
+  void section.offsetHeight;
+  section.classList.add('visible');
+
+  // Hero
+  document.getElementById('heroAge').textContent = r.years + ' Years ' + r.months + ' Months ' + r.days + ' Days';
+  document.getElementById('heroSub').textContent = 'Born on a ' + r.bornDay;
+
+  // Stats
+  var statsData = [
+    { icon: 'fa-calendar-week', value: r.totalMonths, label: 'Months', suffix: '' },
+    { icon: 'fa-calendar-days', value: r.totalWeeks, label: 'Weeks', suffix: '' },
+    { icon: 'fa-sun', value: r.totalDays, label: 'Days', suffix: '' },
+    { icon: 'fa-clock', value: r.totalHours, label: 'Hours', suffix: '' },
+    { icon: 'fa-stopwatch', value: r.totalMinutes, label: 'Minutes', suffix: '' },
+    { icon: 'fa-bolt', value: r.totalSeconds, label: 'Seconds', suffix: '' }
+  ];
+
+  var grid = document.getElementById('statsGrid');
+  grid.innerHTML = '';
+  statsData.forEach(function(s, i) {
+    var card = document.createElement('div');
+    card.className = 'stat-card';
+    card.innerHTML =
+      '<div class="stat-icon"><i class="fas ' + s.icon + '"></i></div>' +
+      '<div class="stat-value" data-target="' + s.value + '">0</div>' +
+      '<div class="stat-label">' + s.label + '</div>';
+    grid.appendChild(card);
+    setTimeout(function() {
+      card.classList.add('animate');
+      animateCounter(card.querySelector('.stat-value'), s.value, 1200);
+    }, 100 + i * 100);
+  });
+
+  // Life progress ring
+  var circumference = 2 * Math.PI * 60; // 377
+  var offset = circumference - (r.lifePercent / 100) * circumference;
+  var ringFill = document.getElementById('ringFill');
+  ringFill.style.strokeDashoffset = circumference;
+  setTimeout(function() {
+    ringFill.style.strokeDashoffset = offset;
+  }, 200);
+
+  // Animate percent number
+  var ringPercent = document.getElementById('ringPercent');
+  var startP = { val: 0 };
+  var targetP = Math.round(r.lifePercent * 10) / 10;
+  var pStart = null;
+  function animP(ts) {
+    if (!pStart) pStart = ts;
+    var prog = Math.min((ts - pStart) / 1500, 1);
+    var eased = 1 - Math.pow(1 - prog, 3);
+    var curr = eased * targetP;
+    ringPercent.textContent = curr.toFixed(1) + '%';
+    if (prog < 1) requestAnimationFrame(animP);
+  }
+  requestAnimationFrame(animP);
+
+  // Life details
+  var details = document.getElementById('lifeDetails');
+  details.innerHTML =
+    '<div class="life-detail-item"><i class="fas fa-heartbeat"></i> <span>Heartbeats: <strong>~' + Math.round(r.totalMinutes * 72).toLocaleString() + '</strong></span></div>' +
+    '<div class="life-detail-item"><i class="fas fa-wind"></i> <span>Breaths taken: <strong>~' + Math.round(r.totalMinutes * 16).toLocaleString() + '</strong></span></div>' +
+    '<div class="life-detail-item"><i class="fas fa-moon"></i> <span>Nights slept: <strong>~' + r.totalDays.toLocaleString() + '</strong></span></div>';
+
+  // Birthday strip
+  var strip = document.getElementById('birthdayStrip');
+  strip.classList.remove('animate');
+  void strip.offsetHeight;
+  document.getElementById('nextBday').textContent = r.daysUntilBday + ' days away — ' +
+    MONTHS[r.nextBday.getMonth()] + ' ' + r.nextBday.getDate() + ', ' + r.nextBday.getFullYear();
+  setTimeout(function() { strip.classList.add('animate'); }, 400);
+
+  // Calendars
+  buildCalendar('calDob', r.dob, 'dob');
+  buildCalendar('calCur', r.cur, 'cur');
+  var calCards = document.querySelectorAll('.cal-card');
+  calCards.forEach(function(c, i) {
+    c.classList.remove('animate');
+    void c.offsetHeight;
+    setTimeout(function() { c.classList.add('animate'); }, 500 + i * 150);
+  });
+
+  // Scroll to result
+  setTimeout(function() {
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+/* ─── PDF ─── */
+document.getElementById('btnPdf').addEventListener('click', function() {
+  if (!lastResult) return;
+  var jsPDF = window.jspdf.jsPDF;
+  var doc = new jsPDF();
+  var r = lastResult;
+
+  doc.setFontSize(22);
+  doc.setTextColor(201, 85, 61);
+  doc.text('Age Calculation Result', 20, 25);
+
+  doc.setFontSize(12);
+  doc.setTextColor(60, 60, 60);
+  doc.text('Date of Birth: ' + MONTHS[r.dob.getMonth()] + ' ' + r.dob.getDate() + ', ' + r.dob.getFullYear(), 20, 40);
+  doc.text('Calculated At: ' + MONTHS[r.cur.getMonth()] + ' ' + r.cur.getDate() + ', ' + r.cur.getFullYear(), 20, 50);
+
+  doc.setFontSize(16);
+  doc.setTextColor(30, 30, 30);
+  doc.text(r.years + ' Years, ' + r.months + ' Months, ' + r.days + ' Days', 20, 68);
+
+  doc.setFontSize(11);
+  doc.setTextColor(80, 80, 80);
+  var y = 84;
+  var lines = [
+    'Total Months: ' + r.totalMonths.toLocaleString(),
+    'Total Weeks: ' + r.totalWeeks.toLocaleString(),
+    'Total Days: ' + r.totalDays.toLocaleString(),
+    'Total Hours: ' + r.totalHours.toLocaleString(),
+    'Total Minutes: ' + r.totalMinutes.toLocaleString(),
+    'Total Seconds: ' + r.totalSeconds.toLocaleString(),
+    '',
+    'Born on a ' + r.bornDay,
+    'Next Birthday: ' + r.daysUntilBday + ' days away',
+    'Life Progress: ' + (Math.round(r.lifePercent * 10) / 10) + '% (based on 80 year expectancy)'
+  ];
+  lines.forEach(function(line) {
+    doc.text(line, 20, y);
+    y += 10;
+  });
+
+  doc.setFontSize(9);
+  doc.setTextColor(150, 150, 150);
+  doc.text('Generated by Ultimate Age Calculator', 20, 280);
+
+  doc.save('age_result.pdf');
+});
+
+/* ─── Copy ─── */
+document.getElementById('btnCopy').addEventListener('click', function() {
+  if (!lastResult) return;
+  var r = lastResult;
+  var text = 'Age: ' + r.years + ' Years, ' + r.months + ' Months, ' + r.days + ' Days\n' +
+    'Total Days: ' + r.totalDays.toLocaleString() + '\n' +
+    'Total Hours: ' + r.totalHours.toLocaleString() + '\n' +
+    'Born on: ' + r.bornDay + '\n' +
+    'Next Birthday: ' + r.daysUntilBday + ' days away';
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function() {
+      showToast('✅ Result copied to clipboard!');
+    });
+  }
+});
+
+/* ─── Reset ─── */
+document.getElementById('btnReset').addEventListener('click', function() {
+  document.getElementById('resultSection').classList.remove('visible');
+  document.getElementById('resultSection').style.display = 'none';
+  setTimeout(function() {
+    document.getElementById('resultSection').style.display = '';
+  }, 50);
+  lastResult = null;
+  document.getElementById('inputSection').scrollIntoView({ behavior: 'smooth' });
+});
+
+/* ─── Select Animations ─── */
+document.querySelectorAll('select').forEach(function(sel) {
+  sel.addEventListener('focus', function() {
+    this.parentElement.style.transform = 'scale(1.02)';
+    this.parentElement.style.transition = 'transform 0.2s ease';
+  });
+  sel.addEventListener('blur', function() {
+    this.parentElement.style.transform = 'scale(1)';
+  });
+});
+</script>
+
 </body>
 </html>
